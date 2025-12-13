@@ -1,48 +1,29 @@
-from flask import Flask , render_template , request
-import joblib
+from flask import Flask, render_template, request
 
-
-model = joblib.load('model.pkl')
-
-
-# Initial
 app = Flask(__name__)
 
-
-
-@app.route('/events')
-def events():
-    return render_template('events.html')
-
-@app.route('/stories')
-def stories():
-    return render_template('stories.html')
-
-# Topics
-@app.route('/topics')
-def topics():
-    return render_template('topics.html')
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
     return render_template("home.html")
-@app.route('/submit' , methods=['post'])
+
+
+@app.route("/submit", methods=["POST"])
 def submit():
-    preg = eval(request.form.get("preg"))
-    plas = eval(request.form.get("plas"))
-    pres = eval(request.form.get("pres"))
-    skin = eval(request.form.get("skin"))
-    test = eval(request.form.get("test"))
-    masss = eval(request.form.get("masss"))
-    pedi = eval(request.form.get("pedi"))
-    age = eval(request.form.get("age"))
+    preg = request.form["preg"]
+    plas = request.form["plas"]
+    pres = request.form["pres"]
+    skin = request.form["skin"]
+    test = request.form["test"]
+    masss = request.form["masss"]
+    pedi = request.form["pedi"]
+    age = request.form["age"]
 
-    prediction = model.predict([[preg, plas, pres, skin, test, masss, pedi, age]])
+    # Just to verify (you can remove later)
+    return f"""
+    Preg: {preg}, Plas: {plas}, Pres: {pres}, Skin: {skin},
+    Test: {test}, Mass: {masss}, Pedi: {pedi}, Age: {age}
+    """
 
-    if prediction[0] == 0:
-        return render_template('non_diabetic.html')
-    else:
-        return render_template('diabetic.html')
 
-# 'preg', 'plas', 'pres', 'skin', 'test', 'masss', 'pedi', 'age'
-
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
