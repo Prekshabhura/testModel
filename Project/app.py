@@ -1,29 +1,43 @@
-from flask import Flask, render_template, request
+from flask import Flask , render_template , request
+import joblib
 
+
+model = joblib.load('model.pkl')
+
+
+# Initial
 app = Flask(__name__)
 
-@app.route("/", methods=["GET"])
+@app.route('/')
 def home():
-    return render_template("home.html")
+    return render_template('home.html')
 
 
-@app.route("/submit", methods=["POST"])
+@app.route('/submit' , methods=['post'])
 def submit():
-    preg = request.form["preg"]
-    plas = request.form["plas"]
-    pres = request.form["pres"]
-    skin = request.form["skin"]
-    test = request.form["test"]
-    masss = request.form["masss"]
-    pedi = request.form["pedi"]
-    age = request.form["age"]
+    preg = eval(request.form.get("preg"))
+    plas = eval(request.form.get("plas"))
+    pres = eval(request.form.get("pres"))
+    skin = eval(request.form.get("skin"))
+    test = eval(request.form.get("test"))
+    masss = eval(request.form.get("masss"))
+    pedi = eval(request.form.get("pedi"))
+    age = eval(request.form.get("age"))
 
-    # Just to verify (you can remove later)
-    return f"""
-    Preg: {preg}, Plas: {plas}, Pres: {pres}, Skin: {skin},
-    Test: {test}, Mass: {masss}, Pedi: {pedi}, Age: {age}
-    """
+    prediction = model.predict([[preg, plas, pres, skin, test, masss, pedi, age]])
+
+    if prediction[0] == 0:
+        return render_template('non_diabetic.html')
+    else:
+        return render_template('diabetic.html')
 
 
-if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0',port=5000)
+app.run(debug=True)
+
+# http://127.0.0.1:5000
+
+# https://www.tutort.net/
+
+# POST :-
+# PUT :-
+# DELETE :-
